@@ -6,57 +6,87 @@
  *
  */
 
-import java.io.IOException;
-import java.io.PrintWriter;
-import java.net.Socket;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class Player 
-{
-	private static int playerCount = 0; // counts how many players have been created
-	
-	private int playerID; // unique identifier for the player
+{	 
+	private final String name; // the name of the player
+	private List<Character> rack; // the letters a player has to play
 	private int score; // tracks the player's score in their game
 	private boolean isTurn; // tracks whether it is the player's turn or not
-	private ArrayList<Character> letters; // the letters a player has to play
-	private Socket clientSocket; // socket for each player
-	private PrintWriter output; // output writer allowing for communication with the player
 	
 	/**
-	 * Default constructor initializes all instance variables
+	 * Constructor to initialize a new player with the given name.
+	 * Initializes all instance variables
+	 * @param playerName the name of the player
 	 */
-	public Player(Socket socket)
-	{
-		playerID = playerCount;
-		playerCount++; // increment player count
+	public Player(String playerName) {
+		name = playerName;
 		score = 0;
 		isTurn = false;
-		letters = new ArrayList<Character>();
-		clientSocket = socket;
-		try
-		{
-            output = new PrintWriter(clientSocket.getOutputStream(), true);
-        } catch (IOException e) 
-		{
-            e.printStackTrace();
-        }
+		rack = new ArrayList<>();
 	} // end default constructor
 
 	/**
-	 * Getter for playerID
-	 * @return the playerID
+	 * Method to add letters to the player's rack
+	 * @param newLetters the letters to add to the player's rack
 	 */
-	public int getPlayerID() 
-	{
-		return playerID;
-	} // end getPlayerID
+	public void addLetters(List<Character> newLetters) {
+		if(newLetters != null) {
+			rack.addAll(newLetters);
+		}
+	} // end addLetters
+
+	/**
+	 * Determines whether the player can form a given word with the letters in its rack 
+	 * @param word the word to check
+	 * @return true if it is possible to form the word with the current rack, false otherwise
+	 */
+	public boolean canFormWord(String word) {
+		if(word == null) return false;
+
+		Map<Character, Integer> letterCounts = new HashMap<>();
+		for (char c : rack) {
+			letterCounts.put(c, letterCounts.getOrDefault(c, 0) + 1);
+		}
+
+		for (char c : word.toUpperCase().toCharArray()) {
+			if (!letterCounts.containsKey(c) || letterCounts.get(c) == 0) {
+				return false;
+			}
+			letterCounts.put(c, letterCounts.get(c) - 1);
+		}
+
+		return true;
+	} // end canFormWord
+
+	/**
+	 * Method to remove letters from the rack given the characters in a word
+	 * @param word the word which letters should be removed from rack
+	 */
+	public void removeUsedLetters(String word) {
+		for(char c : word.toCharArray()) {
+			rack.remove((Character) c);
+		}
+	} // end removeUsedLetters
+	
+	/**
+	 * Getter for name
+	 * @return the name of the player
+	 */
+	public String getName() {
+		return name;
+	} // end getName
 
 	/**
 	 * Getter for score
 	 * @return the score
 	 */
-	public int getScore() 
-	{
+	public int getScore() {
 		return score;
 	} // end getScore
 
@@ -64,8 +94,7 @@ public class Player
 	 * Function to update the player's score
 	 * @param points the amount of points to add
 	 */
-	public void updateScore(int points) 
-	{
+	public void updateScore(int points) {
 		score += points;
 	} // end updateScore
 
@@ -73,8 +102,7 @@ public class Player
 	 * Getter for isTurn
 	 * @return the isTurn
 	 */
-	public boolean isTurn() 
-	{
+	public boolean isTurn() {
 		return isTurn;
 	} // end isTurn
 
@@ -82,102 +110,16 @@ public class Player
 	 * Setter for isTurn
 	 * @param isTurn
 	 */
-	public void setTurn(boolean isTurn) 
-	{
+	public void setTurn(boolean isTurn) {
 		this.isTurn = isTurn;
 	} // end setTurn
-	
-	/**
-	 * Getter for letters
-	 * @return
-	 */
-	public ArrayList<Character> getLetters() 
-	{
-        return letters;
-    } // end getLetters
 
 	/**
-	 * Setter for letters
-	 * @param letters
+	 * Getter for rack
+	 * @return an unmodifiable list view of rack
 	 */
-    public void setLetters(ArrayList<Character> letters) 
-    {
-        this.letters = letters;
-    } // end setLetters
+	public List<Character> getRack() {
+		return Collections.unmodifiableList(rack);
+	} // end getRack
 
-	@Override
-	/**
-	 * Override of the toString method
-	 */
-	public String toString() 
-	{
-		return "Player [playerID=" + playerID + ", score=" + score + ", isTurn=" + isTurn + ", letters=" + letters
-				+ "]";
-	} // end toString
-    
-	/**
-	 * Getter for clientSocket
-	 * @return 
-	 */
-	public Socket getClientSocket()
-	{
-		return clientSocket;
-	}// end getClientSocket
-	
-	/**
-	 * Method to send a message to the player
-	 * @param message
-	 */
-	public void sendMessage(String message)
-	{
-		if (output != null) 
-		{
-            output.println(message);
-        }
-	} // end sendMessage
-	
-	/**
-	 * Method to close the player socket
-	 */
-	public void closeConnection()
-	{
-		try {
-			clientSocket.close();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-	} // end closeConnection
-	
-	/**
-	 * Method to determine if the player's word attempt is valid,
-	 * meaning if they have the necessary letters to make the word.
-	 * @param word
-	 * @return
-	 */
-	public boolean checkValidWordAttempt(String word)
-	{
-		if(word.length() > 7 || word.length() == 0)
-			return false;
-		
-		@SuppressWarnings("unchecked")
-		ArrayList<Character> lettersCopy = (ArrayList<Character>) letters.clone();
-		
-		char[] wordChars = word.toCharArray();
-		
-		// Remove letters from the available letters one by one and check if they are in there
-		for(Character c : wordChars)
-		{
-			if(!lettersCopy.remove(c))
-				return false;
-		}
-		
-		// If it was a valid word, remove the characters from the real letter pool and return true
-		for(Character c : wordChars)
-		{
-			letters.remove(c);
-		}
-		
-		return true;
-	} // end checkValidWordAttempt
-	
 } // end class
