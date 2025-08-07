@@ -8,6 +8,7 @@
  */
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Map;
 import java.util.HashMap;
 import java.util.List;
@@ -52,7 +53,7 @@ public class LetterPool
 
 
 	private List<Character> letterBag; // Bag of letters in the letter pool
-    private Random random;
+    private final Random random;
 	
 	/**
 	 * Default constructor to initialize instance variables
@@ -72,20 +73,34 @@ public class LetterPool
 	
 	/**
 	 * Method to generate a list of random letters from the letter bag.
-	 * The length of the list is specified by the parameter count.
+	 * If count is greater than the available letters, all remaining letters are returned.
+     * This method is synchronized to ensure thread safety.
 	 * @param count the number of letters to randomly select
 	 * @return the list of letters retrieved
 	 */
-    public synchronized ArrayList<Character> getRandomLetters(int count) 
+    public synchronized List<Character> getRandomLetters(int count) 
     {
-        ArrayList<Character> letters = new ArrayList<Character>();
+        int available = letterBag.size();
+        count = Math.min(count, available);
+
+        List<Character> drawnLetters = new ArrayList<>(count);
         for (int i = 0; i < count; i++) 
         {
-            letters.add(letterBag.get(random.nextInt(letterBag.size())));
+            char letter = letterBag.remove(random.nextInt(letterBag.size()));
+            drawnLetters.add(letter);
         }
-        return letters;
+        return drawnLetters;
     } // end getRandomLetters
 	
+    /**
+     * Method to return a list of letters to the letterBag.
+     * This method is synchronized to ensure thread safety.
+     * @param letters the list of letters to return to the letterBag
+     */
+    public synchronized void returnLetters(List<Character> letters) {
+        letterBag.addAll(letters);
+    } // end returnLetters
+
     /**
      * Method to get the point value of a given letter.
      * @param letter the letter to check the value of
@@ -98,11 +113,11 @@ public class LetterPool
 
     /**
      * Getter for letterBag
-     * @return the letterBag
+     * @return the letterBag as a read-only list
      */
     public List<Character> getLetterBag()
     {
-    	return letterBag;
+    	return Collections.unmodifiableList(letterBag);
     } // end getLetterBag
     
 } // end LetterPool
