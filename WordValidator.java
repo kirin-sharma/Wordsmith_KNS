@@ -9,37 +9,40 @@
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.Set;
+import java.util.Collections;
 import java.util.HashSet;
+import java.util.logging.Logger;
+import java.util.logging.Level;
 
 public class WordValidator 
 {
-	private HashSet<String> words; 	// HashSet containing all valid English words
-	
-	/**
-	 * Default constructor reads the list of alphabetical English words from the words_alpha.txt
-	 * file. Credit: https://github.com/dwyl/english-words.git
-	 */
-	public WordValidator()
-	{
-		words = new HashSet<String>();
-		try 
-        {
-            words.addAll(Files.readAllLines(Paths.get("words_alpha.txt")));
-        } catch (IOException e) 
-        {
-            e.printStackTrace();
-        }
-	} // end default Constructor
+	private static final String FILE_PATH = "words_alpha.txt";
+	private static final Logger logger = Logger.getLogger(WordValidator.class.getName());
+
+	// Static set of all valid english words shared by all instances
+	private static final Set<String> WORDS;
+
+	static {
+		Set<String> tempWords = new HashSet<>();
+		try {
+			tempWords.addAll(Files.readAllLines(Paths.get(FILE_PATH)));
+			logger.info("Word list successfully loaded.");
+		} catch(IOException e) {
+			logger.log(Level.SEVERE, "Error reading word list", e);
+		}
+		WORDS = Collections.unmodifiableSet(tempWords);
+	}
 		
 	/**
 	 * Determine if a word is valid by checking if it is in the list of valid English
 	 * words loaded earlier
-	 * @param word
-	 * @return
+	 * @param word the word to check
+	 * @return true if the word is valid, false if not
 	 */
-    public boolean isValidWord(String word) 
+    public static boolean isValidWord(String word) 
     {
-        return words.contains(word.toLowerCase());
+        return WORDS.contains(word.toLowerCase());
     } // end isValidWord
 	
 } // end class
