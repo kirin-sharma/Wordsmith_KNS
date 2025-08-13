@@ -5,6 +5,7 @@ public class GameSession implements Runnable {
     private final Player player2;
     private final LetterPool letterPool;
     private boolean isGameOver;
+    private int turns;
 
     public GameSession(ClientHandler player1Handler, ClientHandler player2Handler) {
         this.player1Handler = player1Handler;
@@ -13,6 +14,7 @@ public class GameSession implements Runnable {
         this.player2 = player2Handler.getPlayer();
         this.letterPool = new LetterPool(); // shared letter pool for both players
         this.isGameOver = false;
+        turns = 0;
     }
 
     @Override
@@ -20,15 +22,9 @@ public class GameSession implements Runnable {
         ClientHandler currentHandler = player1Handler;
         Player currentPlayer = player1;
 
-        while (!isGameOver) {
+        while (!letterPool.isEmpty() && turns < 16) {
             currentPlayer.drawLetters(letterPool);
             playWord(currentPlayer, currentHandler);
-           
-            // Optional: check for game over conditions (e.g., round limit, letter pool empty, player quits)
-            if (letterPool.isEmpty()) {
-                isGameOver = true;
-                break;
-            }
 
             // Switch turns
             if (currentHandler == player1Handler) {
@@ -38,7 +34,11 @@ public class GameSession implements Runnable {
                 currentHandler = player1Handler;
                 currentPlayer = player1;
             }
+            turns++;
         }
+
+
+        // FLAG FLAG
 
         // Game ended - notify players
         player1Handler.sendMessage("Game Over! Final Score: " + player1.getScore());
@@ -46,7 +46,7 @@ public class GameSession implements Runnable {
     }
 
     private boolean playWord(Player player, ClientHandler handler) {
-        handler.sendMessage("It's your turn! Your letters: " + player.getRack().toString() + ". Enter a word: ");
+        handler.sendMessage("It's your turn! Your letters: " + player.getRack().toString() + ". Enter a word or '1' to redraw letters: ");
 
         String word = handler.receiveMessage(); // You may want to add a timeout or null check
         if (word == null) {
@@ -56,11 +56,17 @@ public class GameSession implements Runnable {
 
         word = word.trim().toLowerCase();
 
+        if(word.equals("1")) {
+            player.redrawLetters(letterPool);
+            handler.sendMessage("You have chosen to pass this turn and redraw letters.");
+            return false;
+        }
+
         if (!player.canFormWord(word)) {
             handler.sendMessage("You don't have the necessary letters.");
             return false;
         }
-        
+
         if (!WordValidator.isValidWord(word)) {
             handler.sendMessage("Invalid word.");
             return false;

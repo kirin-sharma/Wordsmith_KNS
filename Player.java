@@ -80,9 +80,8 @@ public class Player
 	 * @param word the word which letters should be removed from rack
 	 */
 	public boolean playWord(String word) {
-		if(!canFormWord(word)) return false;
 		
-		for(char c : word.toCharArray()) {
+		for(char c : word.toUpperCase().toCharArray()) {
 			rack.remove((Character) c);
 		}
 
@@ -120,5 +119,13 @@ public class Player
 	public List<Character> getRack() {
 		return Collections.unmodifiableList(rack);
 	} // end getRack
+
+    
+    public void redrawLetters(LetterPool lp) {
+        List<Character> returning = getRack();
+        lp.returnLetters(returning);
+        rack.clear();
+        drawLetters(lp);
+    }
 
 } // end class

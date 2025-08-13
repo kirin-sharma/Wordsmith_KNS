@@ -18,7 +18,6 @@ public class ClientHandler implements Runnable {
         try {
             in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
             out = new PrintWriter(clientSocket.getOutputStream(), true);
-            out.println("WELCOME: Please enter your name:");
             String name = in.readLine();
             if (name == null || name.trim().isEmpty()) {
                 out.println("Invalid name. Connection closing.");
@@ -31,7 +30,10 @@ public class ClientHandler implements Runnable {
                 playerReady = true;
                 notifyAll();
             }
-            out.println("You have joined the game as " + name);
+            out.println("Welcome! You have joined the game as: " + name + ".");
+            out.println("Type '0' at any time to quit the game.");
+            out.println("You will have 8 chances to input words that total more points than your opponent.");
+
             
             // Keep thread alive until socket closes
             while (!clientSocket.isClosed()) {
@@ -62,9 +64,7 @@ public class ClientHandler implements Runnable {
 
     public String receiveMessage() {
         try {
-            out.flush();
             String res = in.readLine();
-            System.out.println("HERE");
             return res;
         } catch (Exception e) {
             System.out.println("Error");
