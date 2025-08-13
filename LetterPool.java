@@ -12,7 +12,6 @@ import java.util.Collections;
 import java.util.Map;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Random;
 
 public class LetterPool 
 {
@@ -53,14 +52,12 @@ public class LetterPool
 
 
 	private List<Character> letterBag; // Bag of letters in the letter pool
-    private final Random random;
 	
 	/**
 	 * Default constructor to initialize instance variables
 	 */
 	public LetterPool()
 	{
-        random = new Random();
 		letterBag = new ArrayList<>();
         for(Map.Entry<Character, Integer> entry : LETTER_DISTRIBUTION.entrySet()) {
             char letter  = entry.getKey();
@@ -70,28 +67,7 @@ public class LetterPool
             }
         }
 	} // end default constructor
-	
-	/**
-	 * Method to generate a list of random letters from the letter bag.
-	 * If count is greater than the available letters, all remaining letters are returned.
-     * This method is synchronized to ensure thread safety.
-	 * @param count the number of letters to randomly select
-	 * @return the list of letters retrieved
-	 */
-    public synchronized List<Character> getRandomLetters(int count) 
-    {
-        int available = letterBag.size();
-        count = Math.min(count, available);
 
-        List<Character> drawnLetters = new ArrayList<>(count);
-        for (int i = 0; i < count; i++) 
-        {
-            char letter = letterBag.remove(random.nextInt(letterBag.size()));
-            drawnLetters.add(letter);
-        }
-        return drawnLetters;
-    } // end getRandomLetters
-	
     /**
      * Method to return a list of letters to the letterBag.
      * This method is synchronized to ensure thread safety.
@@ -102,15 +78,26 @@ public class LetterPool
     } // end returnLetters
 
     /**
-     * Method to get the point value of a given letter.
+     * Helper method to get the point value of a given letter.
      * @param letter the letter to check the value of
      * @return the point value of the letter
      */
-    public int getLetterPoints(char letter) 
+    private int getLetterPoints(char letter) 
     {
         return LETTER_POINTS.getOrDefault(letter, 0);
     } // end getLetterPoints
 
+
+    public int getWordPoints(String word) {
+        if(word == null) return 0;
+
+        int points = 0;
+        for(char c : word.toCharArray()) {
+            points += getLetterPoints(c);
+        }
+
+        return points;
+    }
     /**
      * Getter for letterBag
      * @return the letterBag as a read-only list
@@ -120,4 +107,8 @@ public class LetterPool
     	return Collections.unmodifiableList(letterBag);
     } // end getLetterBag
     
+
+    public boolean isEmpty() {
+        return letterBag == null || letterBag.isEmpty();
+    }
 } // end LetterPool

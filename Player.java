@@ -11,13 +11,13 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Random;
 
 public class Player 
 {	 
 	private final String name; // the name of the player
 	private List<Character> rack; // the letters a player has to play
 	private int score; // tracks the player's score in their game
-	private boolean isTurn; // tracks whether it is the player's turn or not
 	
 	/**
 	 * Constructor to initialize a new player with the given name.
@@ -27,7 +27,6 @@ public class Player
 	public Player(String playerName) {
 		name = playerName;
 		score = 0;
-		isTurn = false;
 		rack = new ArrayList<>();
 	} // end default constructor
 
@@ -64,15 +63,31 @@ public class Player
 		return true;
 	} // end canFormWord
 
+	public void drawLetters(LetterPool lp) {
+		int available = lp.getLetterBag().size();
+		int needed = 7 - rack.size();
+
+		int count = Math.min(available, needed);
+		Random random = new Random();
+		for(int i = 0; i < count; i++) {
+			char c = lp.getLetterBag().remove(random.nextInt(lp.getLetterBag().size()));
+			rack.add(c);
+		}
+	}
+
 	/**
 	 * Method to remove letters from the rack given the characters in a word
 	 * @param word the word which letters should be removed from rack
 	 */
-	public void removeUsedLetters(String word) {
+	public boolean playWord(String word) {
+		if(!canFormWord(word)) return false;
+		
 		for(char c : word.toCharArray()) {
 			rack.remove((Character) c);
 		}
-	} // end removeUsedLetters
+
+		return true;
+	} // end playWord
 	
 	/**
 	 * Getter for name
@@ -97,22 +112,6 @@ public class Player
 	public void updateScore(int points) {
 		score += points;
 	} // end updateScore
-
-	/**
-	 * Getter for isTurn
-	 * @return the isTurn
-	 */
-	public boolean isTurn() {
-		return isTurn;
-	} // end isTurn
-
-	/**
-	 * Setter for isTurn
-	 * @param isTurn
-	 */
-	public void setTurn(boolean isTurn) {
-		this.isTurn = isTurn;
-	} // end setTurn
 
 	/**
 	 * Getter for rack

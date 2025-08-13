@@ -15,7 +15,7 @@ public class Application
 		
 		WordsmithServer server = new WordsmithServer();
 		
-		server.startServer();
+		server.start();
 	} // end main
 
 } // end class
