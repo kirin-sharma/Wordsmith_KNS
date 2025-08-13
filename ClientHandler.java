@@ -7,6 +7,7 @@ public class ClientHandler implements Runnable {
     private BufferedReader in;
     private PrintWriter out;
     private Player player;
+    private boolean playerReady = false;
 
     public ClientHandler(Socket socket) {
         clientSocket = socket;
@@ -17,18 +18,21 @@ public class ClientHandler implements Runnable {
         try {
             in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
             out = new PrintWriter(clientSocket.getOutputStream(), true);
-
             out.println("WELCOME: Please enter your name:");
-             String name = in.readLine();
+            String name = in.readLine();
             if (name == null || name.trim().isEmpty()) {
                 out.println("Invalid name. Connection closing.");
                 cleanup();
                 return;
             }
 
-            player = new Player(name);
+            synchronized(this) {
+                player = new Player(name);
+                playerReady = true;
+                notifyAll();
+            }
             out.println("You have joined the game as " + name);
-
+            
             // Keep thread alive until socket closes
             while (!clientSocket.isClosed()) {
                 Thread.sleep(1000);
@@ -58,7 +62,10 @@ public class ClientHandler implements Runnable {
 
     public String receiveMessage() {
         try {
-            return in.readLine();
+            out.flush();
+            String res = in.readLine();
+            System.out.println("HERE");
+            return res;
         } catch (Exception e) {
             System.out.println("Error");
             return null;
@@ -72,6 +79,14 @@ public class ClientHandler implements Runnable {
             }
         } catch (Exception e) {
             System.err.println("Error in cleanup: " + e.getMessage());
+        }
+    }
+
+    public synchronized void waitUntilPlayerReady() {
+        while(!playerReady) {
+            try {
+                wait();
+            } catch (Exception e) {}
         }
     }
 

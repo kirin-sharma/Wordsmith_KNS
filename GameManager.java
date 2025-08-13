@@ -15,14 +15,16 @@ public class GameManager {
         while (waitingClients.size() >= 2) {
             ClientHandler p1 = waitingClients.remove(0);
             ClientHandler p2 = waitingClients.remove(0);
-
+               
+            p1.waitUntilPlayerReady();
+            p2.waitUntilPlayerReady();
+            
             GameSession session = new GameSession(p1, p2);
-
             activeSessions.add(session);
-
             new Thread(session).start();  // run session in new thread
+          
         }
-    }
+    } // end tryMatchClients
 
     public synchronized void removeClient(ClientHandler client) {
         waitingClients.remove(client);

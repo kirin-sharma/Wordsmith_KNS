@@ -46,8 +46,7 @@ public class GameSession implements Runnable {
     }
 
     private boolean playWord(Player player, ClientHandler handler) {
-        handler.sendMessage("It's your turn! Your letters: " + player.getRack().toString());
-        handler.sendMessage("Enter a word to play:");
+        handler.sendMessage("It's your turn! Your letters: " + player.getRack().toString() + ". Enter a word: ");
 
         String word = handler.receiveMessage(); // You may want to add a timeout or null check
         if (word == null) {
@@ -55,17 +54,19 @@ public class GameSession implements Runnable {
             return false;
         }
 
-        word = word.trim().toUpperCase();
-
-        if (!WordValidator.isValidWord(word)) {
-            handler.sendMessage("Invalid word.");
-            return false;
-        }
+        word = word.trim().toLowerCase();
 
         if (!player.canFormWord(word)) {
             handler.sendMessage("You don't have the necessary letters.");
             return false;
         }
+        
+        if (!WordValidator.isValidWord(word)) {
+            handler.sendMessage("Invalid word.");
+            return false;
+        }
+
+      
 
         player.playWord(word); // this should deduct letters and update score
         player.updateScore(letterPool.getWordPoints(word));

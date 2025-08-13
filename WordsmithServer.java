@@ -11,7 +11,6 @@ public class WordsmithServer {
     public WordsmithServer() {
         gameManager = new GameManager();
     }
-
     public void start() {
         try {
             serverSocket = new ServerSocket(SERVER_PORT);

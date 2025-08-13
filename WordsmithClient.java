@@ -42,42 +42,26 @@ public class WordsmithClient {
     } // end start
 
     private void handleSession() throws IOException {
-        try {
             sendPlayerName();
-        } catch (Exception e) {
-            System.out.println("Error: " + e.getMessage());
-        }
-
+     
         while(true) {
             String serverMessage = inputReader.readLine();
             if(serverMessage == null) break;
 
-            if(serverMessage.startsWith("LETTERS")) {
-                System.out.println("Available Letters: " + serverMessage.substring(8));
-                System.out.print("Enter a word (or '0' to exit): ");
+            if(serverMessage.contains("Enter a word")) {
+                System.out.println(serverMessage);
                 String word = scanner.nextLine().trim();
 
                 if (word.equalsIgnoreCase("0")) {
                     outputWriter.println("QUIT");
                     break;
                 }
+                outputWriter.println(word);
 
-                outputWriter.println("WORD " + word);
+            } else if(serverMessage.contains("Game Over!")) {
+                System.out.println(serverMessage);
 
-            } else if(serverMessage.startsWith("RESULT")) {
-                System.out.println("Server Result: " + serverMessage.substring(7));
-
-            } else if(serverMessage.startsWith("INFO")) {
-                System.out.println(serverMessage.substring(5));
-
-            } else if(serverMessage.startsWith("ERROR")) {
-                System.err.println("Error" + serverMessage.substring(6));
-
-            } else if(serverMessage.equals("GOODBYE")) {
-                System.out.println("Session ended by server.");
-                break;
-
-            } else {
+            }  else {
                 System.out.println(serverMessage);
             }
         }
@@ -96,7 +80,7 @@ public class WordsmithClient {
             return;
         }
 
-        outputWriter.println("NAME " + name);
+        outputWriter.println(name);
     } // end sendPlayerName
 
     /**

@@ -8,7 +8,6 @@
  */
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Map;
 import java.util.HashMap;
 import java.util.List;
@@ -92,7 +91,7 @@ public class LetterPool
         if(word == null) return 0;
 
         int points = 0;
-        for(char c : word.toCharArray()) {
+        for(char c : word.toUpperCase().toCharArray()) {
             points += getLetterPoints(c);
         }
 
@@ -104,7 +103,7 @@ public class LetterPool
      */
     public List<Character> getLetterBag()
     {
-    	return Collections.unmodifiableList(letterBag);
+    	return letterBag;
     } // end getLetterBag
     
 
