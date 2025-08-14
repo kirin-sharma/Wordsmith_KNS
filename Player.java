@@ -1,8 +1,12 @@
 /**
- * This class represents an individual player in the game.
+ * Project: Wordsmith_KNS
+ * Class: Player
+ * 
+ * This class represents an individual player in the game
+ * and contains logic controlling basic functions a player can perform.
+ * 
  * @author Kirin Sharma
- * @version 1.0
- * CS 310 Final Project
+ * @version 2.0
  *
  */
 
@@ -28,17 +32,7 @@ public class Player
 		name = playerName;
 		score = 0;
 		rack = new ArrayList<>();
-	} // end default constructor
-
-	/**
-	 * Method to add letters to the player's rack
-	 * @param newLetters the letters to add to the player's rack
-	 */
-	public void addLetters(List<Character> newLetters) {
-		if(newLetters != null) {
-			rack.addAll(newLetters);
-		}
-	} // end addLetters
+	} // end constructor
 
 	/**
 	 * Determines whether the player can form a given word with the letters in its rack 
@@ -63,6 +57,10 @@ public class Player
 		return true;
 	} // end canFormWord
 
+	/**
+	 * Method to draw letters to replenish the player's rack, up to 7 maximum.
+	 * @param lp the letter pool to draw from
+	 */
 	public void drawLetters(LetterPool lp) {
 		int available = lp.getLetterBag().size();
 		int needed = 7 - rack.size();
@@ -73,13 +71,26 @@ public class Player
 			char c = lp.getLetterBag().remove(random.nextInt(lp.getLetterBag().size()));
 			rack.add(c);
 		}
-	}
+	} // end drawLetters
+	
+	/**
+	 * Method to clear the player's rack and redraw 7 new random letters
+	 * @param lp the letter pool to return the letters to, then draw from
+	 */
+    public void redrawLetters(LetterPool lp) {
+        List<Character> returning = getRack();
+        lp.returnLetters(returning);
+        rack.clear();
+        drawLetters(lp);
+    } // end redrawLetters
 
 	/**
-	 * Method to remove letters from the rack given the characters in a word
+	 * Method to remove letters from the rack given the characters in a word once the player has played it
 	 * @param word the word which letters should be removed from rack
+	 * @return true if the operation was successful, false if the word was null
 	 */
 	public boolean playWord(String word) {
+		if(word == null) return false;
 		
 		for(char c : word.toUpperCase().toCharArray()) {
 			rack.remove((Character) c);
@@ -97,7 +108,7 @@ public class Player
 	} // end getName
 
 	/**
-	 * Getter for score
+	 * Getter for the player's current score
 	 * @return the score
 	 */
 	public int getScore() {
@@ -119,13 +130,5 @@ public class Player
 	public List<Character> getRack() {
 		return Collections.unmodifiableList(rack);
 	} // end getRack
-
-    
-    public void redrawLetters(LetterPool lp) {
-        List<Character> returning = getRack();
-        lp.returnLetters(returning);
-        rack.clear();
-        drawLetters(lp);
-    }
 
 } // end class

@@ -1,9 +1,12 @@
 /**
- * This class represents the pool of letters available and their
+ * Project: Wordsmith_KNS
+ * Class: LetterPool
+ * 
+ * This class represents the pool of available letters and their
  * respective points for the game Wordsmith.
+ * 
  * @author Kirin Sharma
- * @version 1.0
- * CS 310 Final Project
+ * @version 2.0
  *
  */
 
@@ -14,7 +17,6 @@ import java.util.List;
 
 public class LetterPool 
 {
-
     // Static maps mapping to letter distributions and points
     private static final Map<Character, Integer> LETTER_DISTRIBUTION = new HashMap<>();
     private static final Map<Character, Integer> LETTER_POINTS = new HashMap<>();
@@ -49,11 +51,10 @@ public class LetterPool
         for (char c : tenPoints.toCharArray()) LETTER_POINTS.put(c, 10);
     }
 
-
-	private List<Character> letterBag; // Bag of letters in the letter pool
+	private List<Character> letterBag; // Bag of available letters
 	
 	/**
-	 * Default constructor to initialize instance variables
+	 * Default constructor to initialize the letterBag
 	 */
 	public LetterPool()
 	{
@@ -86,7 +87,11 @@ public class LetterPool
         return LETTER_POINTS.getOrDefault(letter, 0);
     } // end getLetterPoints
 
-
+    /**
+     * Method to get the points of a word based on the value of its characters
+     * @param word the word to score
+     * @return the points associated with the word
+     */
     public int getWordPoints(String word) {
         if(word == null) return 0;
 
@@ -96,7 +101,8 @@ public class LetterPool
         }
 
         return points;
-    }
+    } // end getWordPoints
+
     /**
      * Getter for letterBag
      * @return the letterBag as a read-only list
@@ -106,8 +112,12 @@ public class LetterPool
     	return letterBag;
     } // end getLetterBag
     
-
+    /**
+     * Method to determine if the letterBag is empty (or null)
+     * @return true if the bag is empty or null, false otherwise
+     */
     public boolean isEmpty() {
         return letterBag == null || letterBag.isEmpty();
-    }
-} // end LetterPool
+    } // end isEmpty
+
+} // end class

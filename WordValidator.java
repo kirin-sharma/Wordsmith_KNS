@@ -1,8 +1,11 @@
 /**
+ * Project: Wordsmith_KNS
+ * Class: WordValidator
+ * 
  * This class contains methods to validate words placed by a player.
+ * 
  * @author Kirin Sharma
- * @version 1.0
- * CS 310 Final Project
+ * @version 2.0
  *
  */
 
@@ -17,17 +20,17 @@ import java.util.logging.Level;
 
 public class WordValidator 
 {
-	private static final String FILE_PATH = "words_alpha.txt";
+	private static final String FILE_PATH = "./words_alpha.txt"; // relative file path for the word list
 	private static final Logger logger = Logger.getLogger(WordValidator.class.getName());
 
-	// Static set of all valid english words shared by all instances
+	// Static set of all valid english words shared by all instances of this class
 	private static final Set<String> WORDS;
 
+	// Static block to read all words into the WORDS set
 	static {
 		Set<String> tempWords = new HashSet<>();
 		try {
 			tempWords.addAll(Files.readAllLines(Paths.get(FILE_PATH)));
-			logger.info("Word list successfully loaded.");
 		} catch(IOException e) {
 			logger.log(Level.SEVERE, "Error reading word list", e);
 		}
