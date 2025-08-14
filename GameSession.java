@@ -4,7 +4,6 @@ public class GameSession implements Runnable {
     private final Player player1;
     private final Player player2;
     private final LetterPool letterPool;
-    private boolean isGameOver;
     private int turns;
 
     public GameSession(ClientHandler player1Handler, ClientHandler player2Handler) {
@@ -13,7 +12,6 @@ public class GameSession implements Runnable {
         this.player1 = player1Handler.getPlayer();
         this.player2 = player2Handler.getPlayer();
         this.letterPool = new LetterPool(); // shared letter pool for both players
-        this.isGameOver = false;
         turns = 0;
     }
 
@@ -37,12 +35,21 @@ public class GameSession implements Runnable {
             turns++;
         }
 
+        // Game ended - notify players of results based on scores
+        int p1Score = player1.getScore();
+        int p2Score = player2.getScore();
 
-        // FLAG FLAG
+        if(p1Score > p2Score) {
+            player1Handler.sendMessage("You win! You scored " + p1Score + " points, and your opponent only scored " + p2Score + " points.");
+            player2Handler.sendMessage("You lost. Your opponent scored " + p1Score + " points, and you scored " + p2Score + " points.");
+        } else if(p2Score > p1Score) {
+            player2Handler.sendMessage("You win! You scored " + p2Score + " points, and your opponent only scored " + p1Score + " points.");
+            player1Handler.sendMessage("You lost. Your opponent scored " + p2Score + " points, and you scored " + p1Score + " points.");
+        } else {
+            player1Handler.sendMessage("You tied! You and your opponent both scored " + p1Score + " points.");
+            player2Handler.sendMessage("You tied! You and your opponent both scored " + p2Score + " points.");
+        }
 
-        // Game ended - notify players
-        player1Handler.sendMessage("Game Over! Final Score: " + player1.getScore());
-        player2Handler.sendMessage("Game Over! Final Score: " + player2.getScore());
     }
 
     private boolean playWord(Player player, ClientHandler handler) {
