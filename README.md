@@ -34,14 +34,14 @@ The project demonstrates **Java networking, concurrency, object-oriented design,
 ---
 
 ## Project Structure
-- WordsmithClient.java # Client-side game and IO logic
-- WordsmithServer.java # Server supporting multiple client connections
-- GameManager.java # Manages matching players into game sessions and tracking active sessions
-- GameSession.java # Handles gameplay between two players, and turn-based play
-- ClientHandler.java # Class facilitating and maintaining communication to a client
-- Player.java # Tracks player state and score
-- LetterPool.java # Handles letter distributions and point values
-- WordValidator.java # Validates words against an English dictionary
+- **WordsmithClient.java** : Client-side game and IO logic
+- **WordsmithServer.java** : Server supporting multiple client connections
+- **GameManager.java** : Manages matching players into game sessions and tracking active sessions
+- **GameSession.java** : Handles gameplay between two players, and turn-based play
+- **ClientHandler.java** : Class facilitating and maintaining communication to a client
+- **Player.java** : Tracks player state and score
+- **LetterPool.java** : Handles letter distributions and point values
+- **WordValidator.java** : Validates words against an English dictionary
 
 ## How to Run
 
