@@ -21,19 +21,24 @@ public class GameSession implements Runnable {
 
     private final LetterPool letterPool; // the letter pool that will be used in the game session
     private int turns; // tracks the number of total turns taken between the two players
+    private boolean connected = false;
+
+    private GameManager gm; // Pointer to the GameManager holding this gamesession
 
     /**
      * Constructor to initialize all instance variables necessary to run a game session
      * @param player1Handler the clienthandler for player 1
      * @param player2Handler the clienthandler for player 2
      */
-    public GameSession(ClientHandler player1Handler, ClientHandler player2Handler) {
+    public GameSession(ClientHandler player1Handler, ClientHandler player2Handler, GameManager gm) {
         this.player1Handler = player1Handler;
         this.player2Handler = player2Handler;
         this.player1 = player1Handler.getPlayer();
         this.player2 = player2Handler.getPlayer();
         this.letterPool = new LetterPool(); // shared letter pool for both players
         turns = 0;
+        connected = true;
+        this.gm = gm;
     } // end constructor
 
     @Override
@@ -46,7 +51,7 @@ public class GameSession implements Runnable {
         Player currentPlayer = player1;
 
         // Play until the letter pool is empty, or 16 turns have been taken (8 by each player)
-        while (!letterPool.isEmpty() && turns < 16) {
+        while (connected && !letterPool.isEmpty() && turns < 16) {
 
             currentPlayer.drawLetters(letterPool); // draw letters
             playWord(currentPlayer, currentHandler); // call to helper method to play a word (execute a turn)
@@ -100,6 +105,16 @@ public class GameSession implements Runnable {
         }
 
         word = word.trim().toLowerCase(); // trim the word and format to lowercase
+
+        // If the player has elected to quit, inform both players and quit the game session
+        if(word.equals("0")) {
+            player1Handler.sendMessage("You or your opponent has elected to quit the game. Closing the connection now.");
+            player2Handler.sendMessage("You or your opponent has elected to quit the game. Closing the connection now.");
+            player1Handler.cleanup();
+            player2Handler.cleanup();
+            connected = false;
+            gm.removeSession(this);
+        }
 
         // If the player has elected to redraw letters, allow them to do so
         if(word.equals("1")) {

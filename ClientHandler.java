@@ -105,9 +105,9 @@ public class ClientHandler implements Runnable {
     } // end waitUntilPlayerReady
 
     /**
-     * Private method to close the open clientSocket when it is no longer needed
+     * Method to close the open clientSocket when it is no longer needed
      */
-    private void cleanup() {
+    public void cleanup() {
         try {
             if(clientSocket != null && !clientSocket.isClosed()) {
                 clientSocket.close();

@@ -62,12 +62,6 @@ public class WordsmithClient {
             if(serverMessage.contains("Enter a word")) {
                 System.out.println(serverMessage);
                 String word = scanner.nextLine().trim();
-
-                if (word.equalsIgnoreCase("0")) {
-                    outputWriter.println("QUIT");
-                    close();
-                    break;
-                }
                 outputWriter.println(word);
 
             } else if(serverMessage.contains("You win!") || serverMessage.contains("You lost.") || serverMessage.contains("You tied!")) {

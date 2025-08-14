@@ -40,7 +40,7 @@ public class GameManager {
             p2.waitUntilPlayerReady();
             
             // Initialize a new game session between the two players
-            GameSession session = new GameSession(p1, p2);
+            GameSession session = new GameSession(p1, p2, this);
             activeSessions.add(session);
             new Thread(session).start();  // run session in new thread
           
