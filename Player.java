@@ -61,7 +61,7 @@ public class Player
 	 * Method to draw letters to replenish the player's rack, up to 7 maximum.
 	 * @param lp the letter pool to draw from
 	 */
-	public void drawLetters(LetterPool lp) {
+	public synchronized void drawLetters(LetterPool lp) {
 		int available = lp.getLetterBag().size();
 		int needed = 7 - rack.size();
 
@@ -77,8 +77,8 @@ public class Player
 	 * Method to clear the player's rack and redraw 7 new random letters
 	 * @param lp the letter pool to return the letters to, then draw from
 	 */
-    public void redrawLetters(LetterPool lp) {
-        List<Character> returning = getRack();
+    public synchronized void redrawLetters(LetterPool lp) {
+        List<Character> returning = rack;
         lp.returnLetters(returning);
         rack.clear();
         drawLetters(lp);

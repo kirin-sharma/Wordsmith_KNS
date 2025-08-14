@@ -55,6 +55,9 @@ public class GameSession implements Runnable {
 
             currentPlayer.drawLetters(letterPool); // draw letters
             playWord(currentPlayer, currentHandler); // call to helper method to play a word (execute a turn)
+            if(!connected) break;
+
+            turns++; // increment turns
 
             // Switch turns
             if (currentHandler == player1Handler) {
@@ -64,7 +67,6 @@ public class GameSession implements Runnable {
                 currentHandler = player1Handler;
                 currentPlayer = player1;
             }
-            turns++; // increment turns
         }
 
         // Game ended - notify players of results based on scores
@@ -125,13 +127,13 @@ public class GameSession implements Runnable {
 
         // If the player does not have the necessary letters for the word, inform and pass the turn
         if (!player.canFormWord(word)) {
-            handler.sendMessage("You don't have the necessary letters.");
+            handler.sendMessage("You don't have the necessary letters. Turn passed.");
             return false;
         }
 
         // If the word is invalid, inform and pass the turn
         if (!WordValidator.isValidWord(word)) {
-            handler.sendMessage("Invalid word.");
+            handler.sendMessage("Invalid word. Turn passed.");
             return false;
         }
 
